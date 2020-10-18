@@ -13,8 +13,6 @@ voltage = interp1(time,DYNData.script1.voltage,t);
 current = interp1(time,DYNData.script1.current,t);
 time = t;
 
-% GRADED FUNCTION (do not modify this line)
-
 % function [vk,rck,hk,zk,sik,OCV] = simCellTemp(ik,temp,deltaT,model,z0,iR0,h0)
 %
 % ik - current in amperes, where (+) is discharge. Size is N x 1.
@@ -42,8 +40,6 @@ function [vest,rck,hk,zk,sik,OCV] = simCellTemp(ik,temp,deltaT,model,z0,iR0,h0)
   sik = zeros(N,1); OCV = zeros(N,1);
   rck(1,:) = iR0'; hk(1) = h0; zk(1) = z0; sik(1) = 0;
   OCV(1) = OCVfromSOCtemp(z0,temp(1),model);
-
-    % BEGIN MODIFYING CODE AFTER THIS
   
   for k = 2:length(ik),
   
@@ -88,8 +84,7 @@ function [vest,rck,hk,zk,sik,OCV] = simCellTemp(ik,temp,deltaT,model,z0,iR0,h0)
     sik(k) = sign(ik(k));
     if abs(ik(k))<Q/100, sik(k) = sik(k-1); end
   end
-    
-  % Compute output equation
+ 
   for k = 1:length(ik),
     T = temp(k); % sample code uses only single temperature -- you will need to change this!
     M = getParamESC('MParam',T,model);
@@ -101,25 +96,19 @@ function [vest,rck,hk,zk,sik,OCV] = simCellTemp(ik,temp,deltaT,model,z0,iR0,h0)
   
     vest(k) = OCV(k) - rck(k,:)*RParam' - R0Param*ik(k) + M*hk(k) + M0*sik(k);
   end
-  % FINISH MODIFYING CODE BEFORE THIS
+
 
 end
-% END GRADED FUNCTION
+
 
 % Execute simCellTemp to determine voltage and other internal states/variables
 
 temp = 25*ones(size(current)); % for now, use constant 25 degC temperature.
 % temp = linspace(25,45,length(current)); % uncomment to simulate temperature ramp 
 
-% Note, you will need to change the default initializations "1,0,0" when using a 2RC model
+
 [vest,rck,hk,zk,sik,OCV] = simCellTemp(current,temp,deltaT,model,1,0,0);
 
-% The grader will input custom current, temperature, and initial states and compare output
-% to expected output. You will not be told what these custom inputs will be, but you can still
-% test basic functionality and visualize how the cell behavior changes for different temperatures
-
-% For example, for visualization purposes, plot the measured and simulated voltage data.
-% Note that the simulated voltage will not match the measured voltage very well for simulated
 % temperatures other than 25 degC since the measured data were collected at 25 degC!
 subplot(1,2,1)
 plot(time/3600,voltage,time/3600,vest); % factor of 3600 converts seconds -> hours
